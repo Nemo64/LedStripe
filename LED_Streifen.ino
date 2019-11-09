@@ -1,12 +1,13 @@
 #include <Adafruit_NeoPixel.h>
+#include "Color.h"
 #include "FadeEffect.h"
 #include "RgbEffect.h"
 
 #define LED_PIN         6
 #define LED_COUNT       100
 
-#define SWITCH_DURATION (1024 * 4)
-#define FADE_DURATION   (1024)
+#define SWITCH_DURATION (1024 * 8)
+#define FADE_DURATION   (1024 * 2)
 #define STAY_DURATION   (SWITCH_DURATION - FADE_DURATION)
 #define FADE_DIRECTION  1
 
@@ -53,13 +54,24 @@ void loop() {
   Serial.println(micros() - endTime);
 }
 
+const Color::color rgb[] = {0xff0000, 0x00ff00, 0x0000ff};
+const Color::color wbbb[] = {0xffffff, 0x000000, 0x000000, 0x000000};
+const Color::color fire[] = {0xff6600, 0xff8800, 0xff4400, 0xff2200};
+const Color::color waves[] = {0xccffff, 0x44aaff, 0x0088ff, 0x0044ff, 0x0000ff, 0x0000ff, 0x0000ff};
+      
 void renderEffect(Adafruit_NeoPixel &strip, const int &effect, const uint16_t &first, const uint16_t &last) {
-  switch (effect % 2) {
+  switch (effect % 4) {
     case 0:
-      RgbEffect::run(strip, first, last);
+      RgbEffect::run<16>(strip, first, last, rgb);
       break;
     case 1:
-      FadeEffect::run(strip, first, last);
+      RgbEffect::run<8>(strip, first, last, wbbb);
+      break;
+    case 2:
+      RgbEffect::run<8>(strip, first, last, fire);
+      break;
+    case 3:
+      RgbEffect::run<8>(strip, first, last, waves);
       break;
   }
 }
