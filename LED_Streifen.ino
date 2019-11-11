@@ -29,7 +29,7 @@ void loop() {
   unsigned time = millis();
   unsigned effect = time / EFFECT_DURATION;
   unsigned progress = time % EFFECT_DURATION;
-
+  
   renderWithTransition < EFFECT_DURATION, FADE_DURATION, FORWARDS, 0, 50 > (strip, effect, progress);
   renderWithTransition < EFFECT_DURATION, FADE_DURATION, FORWARDS, 50, 100 > (strip, effect - 1, progress);
 
