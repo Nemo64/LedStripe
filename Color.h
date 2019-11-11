@@ -12,15 +12,11 @@ typedef uint8_t progress;
 const progress MAX_PROGRESS = 128;
 const progress MIN_PROGRESS = 0;
 
-channel transitionChannel(const channel &c1, const channel &c2, const progress &progress) {
-  if (c1 > c2) {
-    return ((uint16_t)((c1 - c2) * (MAX_PROGRESS - progress)) / MAX_PROGRESS) + c2;
-  } else {
-    return ((uint16_t)((c2 - c1) * progress) / MAX_PROGRESS) + c1;
-  }
+inline channel transitionChannel(const channel &c1, const channel &c2, const progress &progress) {
+  return c1 + (c2 - c1) * progress / MAX_PROGRESS;
 }
 
-color transition(const color &c1, const color &c2, const progress &progress) {
+inline color transition(const color &c1, const color &c2, const progress &progress) {
   auto c1s = reinterpret_cast<const channel(&)[4]>(c1);
   auto c2s = reinterpret_cast<const channel(&)[4]>(c2);
   channel result[4] = {
