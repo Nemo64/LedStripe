@@ -45,7 +45,7 @@ inline color_t getColor(unsigned time, unsigned roll, unsigned position, unsigne
   return transition(color1, color2, progress);
 }
 
-template <unsigned DENSITY = 8, unsigned ROLL_TIME = 64, color_t... COLOR_PARAMETERS>
+template <unsigned DENSITY, unsigned ROLL_TIME, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
 
   unsigned time = millis();

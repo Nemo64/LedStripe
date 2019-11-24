@@ -1,6 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 #include "CycleEffect.h"
 #include "NoiseEffect.h"
+#include "WaveEffect.h"
 
 #define LED_PIN         6
 #define LED_COUNT       100
@@ -22,9 +23,10 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_BRG + NEO_KHZ800);
 // with the default 16 seconds per effect, you should use 1, 2 or 4 effects or change the timestamp type.
 typedef void (*effect_t)(Adafruit_NeoPixel &, uint16_t, uint16_t);
 const effect_t effects[] = {
-  //CycleEffect::run<2, 1, true, 0xff00ff, 0x000000, 0x000000, 0x000000>,
   CycleEffect::run<8, 2, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>,
-  NoiseEffect::run<8, 128, 0x992000, 0xcc2500, 0xff3000, 0x661600>,
+  WaveEffect::run<32, 1024, 1024, true, 0x000010, 0x6699ff>,
+  NoiseEffect::run<8, 64, 0x992000, 0xcc2500, 0xff3000, 0x661600>,
+  CycleEffect::run<2, 1, true, 0xff00ff, 0x000000, 0x000000, 0x000000>,
 };
 const size_t EFFECT_COUNT = sizeof(effects) / sizeof(effects[0]);
 

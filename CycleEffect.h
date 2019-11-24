@@ -7,7 +7,7 @@
 namespace CycleEffect {
 using namespace Color;
 
-template <unsigned DENSITY = 16, unsigned SPEED_DIVIDER = 4, bool FORWARDS = true, color_t... COLOR_PARAMETERS>
+template <unsigned DENSITY, unsigned SPEED_DIVIDER, bool FORWARDS, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
   color_t COLORS[] = {COLOR_PARAMETERS...};
   size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
