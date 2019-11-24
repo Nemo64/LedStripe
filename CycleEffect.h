@@ -19,8 +19,8 @@ void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
     auto adjustedTime = time + i * PIXEL_TIME_SHIFT * (FORWARDS ? -1 : 1);
     auto progress = adjustedTime % MAX_PROGRESS;
 
-    auto index1 = adjustedTime / MAX_PROGRESS % COLOR_COUNT;
-    auto index2 = index1 + 1 == COLOR_COUNT ? 0 : index1 + 1;
+    auto index2 = adjustedTime / MAX_PROGRESS % COLOR_COUNT;
+    auto index1 = index2 == 0 ? COLOR_COUNT - 1 : index2 - 1;
 
     auto finalColor = transition(COLORS[index1], COLORS[index2], progress);
     strip.setPixelColor(i, finalColor);

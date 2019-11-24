@@ -45,16 +45,27 @@ inline color_t getColor(unsigned time, unsigned roll, unsigned position, unsigne
   return transition(color1, color2, progress);
 }
 
-template <unsigned DENSITY = 16, unsigned ROLL_TIME = 128, color_t... COLOR_PARAMETERS>
+template <unsigned DENSITY = 8, unsigned ROLL_TIME = 64, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
 
   unsigned time = millis();
   auto progress = (unsigned long)(time % ROLL_TIME) * MAX_PROGRESS / ROLL_TIME;
   auto roll = time / ROLL_TIME;
 
+  // the strip will be split into segments of color which will be faded between
+  // to avoid repeated calculation of the same color, I calculate them all in the beginning
+  // since there is a maximum of 300 leds (i think), the memory footprint of this could be 156 bytes which is fine imo
+  auto firstSegment = first / DENSITY;
+  auto lastSegment = (last + DENSITY - 1) / DENSITY + 1; // round up and since there is always a fade, I need to calculate 1 segment more
+  color_t colors[lastSegment - firstSegment]; // that this works is awesome: dynamic array sinze in stack
+  for (auto segment = firstSegment; segment < lastSegment; ++segment) {
+    colors[segment - firstSegment] = getColor<COLOR_PARAMETERS...>(time, roll, segment, progress);
+  }
+
   for (auto i = first; i < last; ++i) {
-    auto color1 = getColor<COLOR_PARAMETERS...>(time, roll, i / DENSITY, progress);
-    auto color2 = getColor<COLOR_PARAMETERS...>(time, roll, i / DENSITY + 1, progress);
+    auto colorIndex = i / DENSITY - firstSegment;
+    auto color1 = colors[colorIndex];
+    auto color2 = colors[colorIndex + 1];
     auto fade = i % DENSITY * MAX_PROGRESS / DENSITY;
     auto finalColor = transition(color1, color2, fade);
     strip.setPixelColor(i, finalColor);
