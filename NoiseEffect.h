@@ -32,7 +32,7 @@ const uint8_t rndtable[256] = {
 const unsigned RANDOM_NUMBERS = sizeof(rndtable) / sizeof(rndtable[0]);
 
 template <color_t... COLOR_PARAMETERS>
-inline color_t getColor(unsigned time, unsigned roll, unsigned position, unsigned progress) {
+inline color_t getColor(unsigned roll, unsigned position, unsigned progress) {
   color_t COLORS[] = {COLOR_PARAMETERS...};
   size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
   
@@ -59,7 +59,7 @@ void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
   auto lastSegment = (last + DENSITY - 1) / DENSITY + 1; // round up and since there is always a fade, I need to calculate 1 segment more
   color_t colors[lastSegment - firstSegment]; // that this works is awesome: dynamic array sinze in stack
   for (auto segment = firstSegment; segment < lastSegment; ++segment) {
-    colors[segment - firstSegment] = getColor<COLOR_PARAMETERS...>(time, roll, segment, progress);
+    colors[segment - firstSegment] = getColor<COLOR_PARAMETERS...>(roll, segment, progress);
   }
 
   for (auto i = first; i < last; ++i) {

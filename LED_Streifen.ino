@@ -1,4 +1,5 @@
 #include <Adafruit_NeoPixel.h>
+#include "AlternatingCycleEffect.h"
 #include "CycleEffect.h"
 #include "NoiseEffect.h"
 #include "WaveEffect.h"
@@ -8,10 +9,10 @@
 #define SERIAL_TIMINGS  0
 
 // effect timing
-// Eake sure every effect is a power of 2 like 1024, 2048, 4096 etc.
+// Make sure every effect is a power of 2 like 1024, 2048, 4096 etc.
 // Otherwise divisions will be slow and overflows will have strange effects
 const unsigned EFFECT_DURATION = 16 * 1024;
-const unsigned FADE_DURATION = 2 * 1024;
+const unsigned FADE_DURATION = 4 * 1024;
 
 // led strip definition
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_BRG + NEO_KHZ800);
@@ -23,10 +24,14 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_BRG + NEO_KHZ800);
 // with the default 16 seconds per effect, you should use 1, 2 or 4 effects or change the timestamp type.
 typedef void (*effect_t)(Adafruit_NeoPixel &, uint16_t, uint16_t);
 const effect_t effects[] = {
-  CycleEffect::run<8, 2, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>,
-  WaveEffect::run<32, 1024, 1024, true, 0x000010, 0x6699ff>,
-  NoiseEffect::run<8, 64, 0x992000, 0xcc2500, 0xff3000, 0x661600>,
-  CycleEffect::run<2, 1, true, 0xff00ff, 0x000000, 0x000000, 0x000000>,
+  //NoiseEffect::run<8, 64, 0x0000ff, 0x0066ff, 0x000000, 0x000000>, // police effect
+  //AlternatingCycleEffect::run<1, 2, 0xff0000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000>, // K.I.T.T
+  //CycleEffect::run<8, 8, true, 0xff4400, 0x00ff00, 0x00ffff, 0xff00ff>, // other color cycle
+  //WaveEffect::run<32, 1024, 1024, true, 0x000010, 0x6699ff>, // wave experiment
+  NoiseEffect::run<8, 64, 0x992000, 0xcc2500, 0xff3000, 0x661600>, // fire
+  CycleEffect::run<8, 4, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
+  //CycleEffect::run<2, 4, true, 0xff00ff, 0x000000, 0x000000, 0x000000>, // pink parade
+  //CycleEffect::run<4, 8, true, 0xff0000, 0xff0000, 0x00ff00, 0x00ff00>, // red/green
 };
 const size_t EFFECT_COUNT = sizeof(effects) / sizeof(effects[0]);
 
@@ -36,7 +41,6 @@ bool startup = true;
 
 void setup() {
   strip.begin();
-  strip.setBrightness(0xff);
 #if SERIAL_TIMINGS == 1
   Serial.begin(9600);
 #endif
@@ -49,8 +53,9 @@ const uint8_t FROM_START = 0;
 const uint8_t FROM_END = 1;
 const uint8_t TO_START = 2;
 const uint8_t TO_END = 3;
+template<unsigned DURATION = FADE_DURATION>
 inline void runEffect (Adafruit_NeoPixel &strip, effect_t effect, unsigned start, unsigned end, unsigned progress, uint8_t mode) {
-  unsigned pixelProgress = (unsigned long)(end - start) * progress / FADE_DURATION;
+  unsigned pixelProgress = (unsigned long)(end - start) * progress / DURATION;
   switch (mode) {
     case FROM_START: start = start + pixelProgress; break;
     case FROM_END: end = end - pixelProgress; break;
@@ -63,8 +68,12 @@ inline void runEffect (Adafruit_NeoPixel &strip, effect_t effect, unsigned start
   }
 }
 
+#if SERIAL_TIMINGS == 1
 unsigned long lastLoopTime = 0;
+#endif
+
 void loop() {
+
 #if SERIAL_TIMINGS == 1
   auto startTime = micros();
 #endif
