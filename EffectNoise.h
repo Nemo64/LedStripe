@@ -1,10 +1,10 @@
-#ifndef NOISE_EFFECT_H
-#define NOISE_EFFECT_H
+#ifndef EFFECT_NOISE_H
+#define EFFECT_NOISE_H
 
 #include <Adafruit_NeoPixel.h>
 #include "Color.h"
 
-namespace NoiseEffect {
+namespace EffectNoise {
 using namespace Color;
 
 // this table is stolen from m_random.c of DOOM
@@ -33,9 +33,9 @@ const unsigned RANDOM_NUMBERS = sizeof(rndtable) / sizeof(rndtable[0]);
 
 template <color_t... COLOR_PARAMETERS>
 inline color_t getColor(unsigned roll, unsigned position, unsigned progress) {
-  color_t COLORS[] = {COLOR_PARAMETERS...};
-  size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
-  
+  static const color_t COLORS[] = {COLOR_PARAMETERS...};
+  static const size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
+
   auto adjustedRoll = roll + position * 32;
   auto index1 = adjustedRoll % RANDOM_NUMBERS;
   auto index2 = index1 + 1 == RANDOM_NUMBERS ? 0 : index1 + 1;
@@ -48,7 +48,7 @@ inline color_t getColor(unsigned roll, unsigned position, unsigned progress) {
 template <unsigned DENSITY, unsigned ROLL_TIME, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
 
-  unsigned time = millis();
+  auto time = millis();
   auto progress = (unsigned long)(time % ROLL_TIME) * MAX_PROGRESS / ROLL_TIME;
   auto roll = time / ROLL_TIME;
 

@@ -1,28 +1,22 @@
-#ifndef ALTERNATING_CYCLE_EFFECT_H
-#define ALTERNATING_CYCLE_EFFECT_H
+#ifndef EFFECT_CYCLE_H
+#define EFFECT_CYCLE_H
 
 #include <Adafruit_NeoPixel.h>
 #include "Color.h"
 
-namespace AlternatingCycleEffect {
+namespace EffectCycle {
 using namespace Color;
 
-template <unsigned DENSITY, unsigned SPEED_DIVIDER, color_t... COLOR_PARAMETERS>
+template <unsigned DENSITY, unsigned SPEED_DIVIDER, bool FORWARDS, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
   static const color_t COLORS[] = {COLOR_PARAMETERS...};
   static const size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
   unsigned PIXEL_TIME_SHIFT = MAX_PROGRESS / DENSITY;
-  
-  unsigned DIRECTION_DURATION = COLOR_COUNT * MAX_PROGRESS;
-  unsigned TOTAL_DURATION = DIRECTION_DURATION * 2;
 
-  unsigned time = millis() / SPEED_DIVIDER % TOTAL_DURATION;
-  if (time > DIRECTION_DURATION) {
-    time = TOTAL_DURATION - time;
-  }
+  unsigned time = millis() / SPEED_DIVIDER;
 
   for (auto i = first; i < last; ++i) {
-    auto adjustedTime = time + i * PIXEL_TIME_SHIFT;
+    auto adjustedTime = time + i * PIXEL_TIME_SHIFT * (FORWARDS ? -1 : 1);
     auto progress = adjustedTime % MAX_PROGRESS;
 
     auto index2 = adjustedTime / MAX_PROGRESS % COLOR_COUNT;

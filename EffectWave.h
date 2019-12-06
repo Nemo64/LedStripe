@@ -1,10 +1,10 @@
-#ifndef WAVE_EFFECT_H
-#define WAVE_EFFECT_H
+#ifndef EFFECT_WAVE_H
+#define EFFECT_WAVE_H
 
 #include <Adafruit_NeoPixel.h>
 #include "Color.h"
 
-namespace WaveEffect {
+namespace EffectWave {
 using namespace Color;
 
 template <unsigned DENSITY, unsigned ATTACK, unsigned DECAY, bool FORWARDS, color_t GROUND_COLOR, color_t WAVE_COLOR>
@@ -22,11 +22,11 @@ void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
     } else {
       waveProgress = DENSITY - (unsigned long)(progress - ATTACK) * DENSITY / DECAY;
     }
-    
+
     // make the wave movement exponential
     auto inversedWaveProgress = DENSITY - waveProgress;
     waveProgress = DENSITY - inversedWaveProgress * inversedWaveProgress / DENSITY;
-    
+
     auto waveMiddle = FORWARDS ? waveStart + waveProgress : waveEnd - waveProgress;
 
     // print the fade in side (from the beginning of the strip)
