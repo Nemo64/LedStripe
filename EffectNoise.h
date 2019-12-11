@@ -29,12 +29,13 @@ const uint8_t rndtable[256] = {
   197, 242,  98,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136 ,
   120, 163, 236, 249
 };
-const unsigned RANDOM_NUMBERS = sizeof(rndtable) / sizeof(rndtable[0]);
+const size_t RANDOM_NUMBERS = sizeof(rndtable) / sizeof(rndtable[0]);
 
 template <color_t... COLOR_PARAMETERS>
 inline color_t getColor(unsigned roll, unsigned position, unsigned progress) {
   static const color_t COLORS[] = {COLOR_PARAMETERS...};
   static const size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
+  static_assert(COLOR_COUNT >= 2, "There must be at least 2 colors defined");
 
   auto adjustedRoll = roll + position * 32;
   auto index1 = adjustedRoll % RANDOM_NUMBERS;
@@ -47,10 +48,7 @@ inline color_t getColor(unsigned roll, unsigned position, unsigned progress) {
 
 template <unsigned DENSITY, unsigned ROLL_TIME, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
-
-  auto time = millis();
-  auto progress = (unsigned long)(time % ROLL_TIME) * MAX_PROGRESS / ROLL_TIME;
-  auto roll = time / ROLL_TIME;
+  unsigned time = millis();
 
   // the strip will be split into segments of color which will be faded between
   // to avoid repeated calculation of the same color, I calculate them all in the beginning
@@ -59,6 +57,9 @@ void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
   auto lastSegment = (last + DENSITY - 1) / DENSITY + 1; // round up and since there is always a fade, I need to calculate 1 segment more
   color_t colors[lastSegment - firstSegment]; // that this works is awesome: dynamic array sinze in stack
   for (auto segment = firstSegment; segment < lastSegment; ++segment) {
+    unsigned localTime = time + rndtable[segment % RANDOM_NUMBERS] * ROLL_TIME / RANDOM_NUMBERS;
+    unsigned progress = (unsigned long)(time % ROLL_TIME) * MAX_PROGRESS / ROLL_TIME;
+    unsigned roll = time / ROLL_TIME;
     colors[segment - firstSegment] = getColor<COLOR_PARAMETERS...>(roll, segment, progress);
   }
 

@@ -30,14 +30,18 @@ const unsigned FADE_DURATION = 2 * 1024;
 // for best results: have a power of 2 effects, otherwise some effects will show up more often than others
 // also: EFFECT_COUNT * EFFECT_DURATION must be <= 65536 since the timestamp is a 16 bit timestamp.
 // with the default 16 seconds per effect, you should use 1, 2 or 4 effects or change the timestamp type.
-const size_t EFFECT_COUNT = 2;
-const Effects::effect_t effectsF[EFFECT_COUNT] = {
+const size_t EFFECT_COUNT = 4;
+const Effects::effect_t effects[EFFECT_COUNT] = {
+  EffectCycle::run<8, 8, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
+  EffectCycle::run<2, 4, true, 0x00ff99, 0x000000, 0x000000, 0x000000>, // street lights in the backseat
+  EffectCycle::run<8, 8, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
   EffectNoise::run<2, 256, 0x992000, 0xcc2500, 0xff3000, 0x661600>, // fire
-  EffectCycle::run<8, 4, true, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
 };
 const Effects::effect_t effectsR[EFFECT_COUNT] = {
+  EffectCycle::run<8, 8, false, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
+  EffectCycle::run<2, 4, false, 0x00ff99, 0x000000, 0x000000, 0x000000>, // street lights in the backseat
+  EffectCycle::run<8, 8, false, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
   EffectNoise::run<2, 256, 0x992000, 0xcc2500, 0xff3000, 0x661600>, // fire
-  EffectCycle::run<8, 4, false, 0xff0000, 0xff4400, 0x00ff00, 0x0000ff>, // RGB cycle
 };
 // these are unused effects that i experimented with
 //EffectNoise::run<8, 64, 0x0000ff, 0x0066ff, 0x000000, 0x000000>, // police effect
@@ -71,13 +75,13 @@ void loop() {
     Effects::startup = false;
   }
 
-  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip1, effectsF[effect1], effectsF[effect2], STRIP_1_0, STRIP_1_1, fadeProgress);
-  Effects::runWithStartup<FADE_DURATION, Effects::REVERSE>(strip1, effectsR[effect1], effectsR[effect2], STRIP_1_1, STRIP_1_2, fadeProgress);
-  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip1, effectsF[effect1], effectsF[effect2], STRIP_1_2, STRIP_1_3, fadeProgress);
+  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip1, effects[effect1], effects[effect2], STRIP_1_0, STRIP_1_1, fadeProgress);
+  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip1, effects[effect1], effects[effect2], STRIP_1_1, STRIP_1_2, fadeProgress);
+  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip1, effects[effect1], effects[effect2], STRIP_1_2, STRIP_1_3, fadeProgress);
 
-  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip2, effectsF[effect1], effectsF[effect2], STRIP_2_0, STRIP_2_1, fadeProgress);
+  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip2, effects[effect1], effects[effect2], STRIP_2_0, STRIP_2_1, fadeProgress);
   Effects::runWithStartup<FADE_DURATION, Effects::REVERSE>(strip2, effectsR[effect1], effectsR[effect2], STRIP_2_1, STRIP_2_2, fadeProgress);
-  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip2, effectsF[effect1], effectsF[effect2], STRIP_2_2, STRIP_2_3, fadeProgress);
+  Effects::runWithStartup<FADE_DURATION, Effects::FORWARD>(strip2, effects[effect1], effects[effect2], STRIP_2_2, STRIP_2_3, fadeProgress);
 
 #if SERIAL_TIMINGS == 1
   auto endTime = micros();

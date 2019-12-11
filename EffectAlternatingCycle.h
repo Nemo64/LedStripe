@@ -11,6 +11,7 @@ template <unsigned DENSITY, unsigned SPEED_DIVIDER, color_t... COLOR_PARAMETERS>
 void run (Adafruit_NeoPixel &strip, uint16_t first, uint16_t last) {
   static const color_t COLORS[] = {COLOR_PARAMETERS...};
   static const size_t COLOR_COUNT = sizeof(COLORS) / sizeof(color_t);
+  static_assert(COLOR_COUNT >= 2, "There must be at least 2 colors defined");
   unsigned PIXEL_TIME_SHIFT = MAX_PROGRESS / DENSITY;
 
   unsigned DIRECTION_DURATION = COLOR_COUNT * MAX_PROGRESS;
